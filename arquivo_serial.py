@@ -3,44 +3,36 @@ import serial
 import tkinter as tk
 from tkinter import *
 
+#inicializa a comunicação com a porta serial ('PORTA SERIAL', 'VELOCIDADE DE COMUNICAÇÃO')
+ser = serial.Serial('COM3', 9600)
+
 def LeituraSerial():
     print("Função acessada")
+    valor_recebido = 'a'
     #Função de tratamento de erros
     try:
-        #inicializa a comunicação com a porta serial ('PORTA SERIAL', 'VELOCIDADE DE COMUNICAÇÃO')
-        ser = serial.Serial('COM3', 9600)
-
-        #lê e armazena tudo o que está escrito em uma mesma linha na porta serial
         valor_recebido = ser.readline()
-
-        #fecha a comunicação serial
-        ser.close()
-
+    
     #caso a lógica executada dentro do 'try' tenha algum erro é executado esse bloco
     except:
         print("Erro ao inicializar porta serial")
         valor_recebido = "Erro"
 
     #Cria uma variável que exibirá o que foi lido na porta serial
-    RetornoLeituraSerial = Label(janela, text=valor_recebido)
+    RetornoLeituraSerial = Label(janela, text=valor_recebido.decode())
     RetornoLeituraSerial.place(x=740,y=112)
     RetornoLeituraSerial['bg'] = 'light blue'
 
 def EnviarDados():
-    print(EnviarDadosSerial.get())
+    DadoEnviado = EnviarDadosSerial.get()
+    
     try:
-        ser = serial.Serial('COM3', 9600)
-        while True:
-            ser.write(EnviarDadosSerial.get())
-            if ser.inWaiting() > 0:
-                ser.close()
-                break
+        ser.write(DadoEnviado.encode())
+        print("led ligado")
     except:
-        print("Erro ao enviar mensagem")
-        MensagemErroEnvio = Label(janela, text="Erro ao enviar mensagem para a porta serial")
-        MensagemErroEnvio.place(x=550,y=230)
-        MensagemErroEnvio['bg'] = 'light blue'
-
+        print("Erro ao enviar dados")
+    
+    ser.flush()
 
 #cria uma janela Tkinter
 janela = tk.Tk()
@@ -73,3 +65,5 @@ BotaoEnviarDadosSerial['bg'] = '#00FF7F'
 
 #Cria um loop na janela para ela não ser fechada automaticamente
 janela.mainloop()
+
+ser.close()
